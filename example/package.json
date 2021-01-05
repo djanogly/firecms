@@ -3,15 +3,15 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-        "@camberi/firecms": "link:..",
-        "@material-ui/core": "link:../node_modules/@material-ui/core",
-        "@material-ui/icons": "link:../node_modules/@material-ui/icons",
-        "@material-ui/pickers": "link:../node_modules/firebase",
-        "algoliasearch": "link:../node_modules/algoliasearch",
-        "firebase": "link:../node_modules/firebase",
-        "react": "link:../node_modules/react",
-        "react-dom": "link:../node_modules/react-dom",
-        "react-scripts": "link:../node_modules/react-scripts"
+        "@camberi/firecms": "^0.22.0",
+        "@material-ui/core": "file:../node_modules/@material-ui/core",
+        "@material-ui/icons": "file:../node_modules/@material-ui/icons",
+        "@material-ui/pickers": "file:../node_modules/firebase",
+        "algoliasearch": "file:../node_modules/algoliasearch",
+        "firebase": "file:../node_modules/firebase",
+        "react": "file:../node_modules/react",
+        "react-dom": "file:../node_modules/react-dom",
+        "react-scripts": "file:../node_modules/react-scripts"
     },
     "scripts": {
         "start": "node ../node_modules/react-scripts/bin/react-scripts.js start",

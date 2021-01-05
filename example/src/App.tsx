@@ -17,619 +17,659 @@ import PriceTextPreview from "./custom_preview/PriceTextPreview";
 import CustomColorTextField from "./custom_field/CustomColorTextField";
 import CustomBooleanPreview from "./custom_preview/CustomBooleanPreview";
 import {
-    blogSearchDelegate,
-    productsSearchDelegate,
+    // blogSearchDelegate,
+    partnersSearchDelegate,
     usersSearchDelegate
 } from "./algolia_utils";
 import firebase from "firebase";
 import { IconButton, Tooltip } from "@material-ui/core";
-import GitHubIcon from "@material-ui/icons/GitHub";
+// import GitHubIcon from "@material-ui/icons/GitHub";
 import { ExampleAdditionalView } from "./ExampleAdditionalView";
-import logo from "./images/test_shop_logo.png";
+import logo from "./images/coffy_logo.png";
 
 
 function App() {
 
-    const locales: EnumValues<string> = {
-        "es": "Spanish",
-        "de": "German",
-        "en": "English",
-        "it": "Italian",
-        "fr": "French"
-    };
+    
 
-    const categories: EnumValues<string> = {
-        art_and_decoration: "Art and decoration",
-        art_design_books: "Art and design books",
-        babys: "Babies and kids",
-        backpacks: "Backpacks and bags",
-        bath: "Bath",
-        bicycle: "Bicycle",
-        books: "Books",
-        cameras: "Cameras",
-        clothing_man: "Clothing man",
-        clothing_woman: "Clothing woman",
-        coffee_and_tea: "Coffee and tea",
-        cookbooks: "Cookbooks",
-        delicatessen: "Delicatessen",
-        desk_accessories: "Desk accessories",
-        exercise_equipment: "Exercise equipment",
-        furniture: "Furniture",
-        gardening: "Gardening",
-        headphones: "Headphones",
-        home_accessories: "Home accessories",
-        home_storage: "Home storage",
-        kitchen: "Kitchen",
-        lighting: "Lighting",
-        music: "Music",
-        outdoors: "Outdoors",
-        personal_care: "Personal care",
-        photography_books: "Photography books",
-        serveware: "Serveware",
-        smart_home: "Smart Home",
-        sneakers: "Sneakers",
-        speakers: "Speakers",
-        sunglasses: "Sunglasses",
-        toys_and_games: "Toys and games",
-        watches: "Watches"
-    };
-
-    const productSchema = buildSchema({
-        name: "Product",
+    const partnerSchema = buildSchema({
+        name: "Partner",
         properties: {
-            name: {
-                dataType: "string",
-                title: "Name",
-                validation: {
-                    required: true
-                }
-            },
-            main_image: {
-                dataType: "string",
-                title: "Image",
-                config: {
-                    storageMeta: {
-                        mediaType: "image",
-                        storagePath: "images",
-                        acceptedFiles: ["image/*"],
-                        metadata: {
-                            cacheControl: "max-age=1000000"
-                        }
-                    }
-                },
-                description: "Upload field for images",
-                validation: {
-                    required: true
-                }
-            },
-            category: {
-                dataType: "string",
-                title: "Category",
-                config: {
-                    enumValues: categories
-                }
-            },
-            price: {
-                dataType: "number",
-                title: "Price",
-                validation: {
-                    requiredMessage: "You must set a price between 0 and 1000",
-                    min: 0,
-                    max: 1000
-                },
-                config: {
-                    customPreview: PriceTextPreview
-                },
-                description: "Price with range validation"
-            },
-            currency: {
-                dataType: "string",
-                title: "Currency",
-                config: {
-                    enumValues: {
-                        EUR: "Euros",
-                        DOL: "Dollars"
-                    }
-                },
-                validation: {
-                    required: true
-                }
-            },
-            public: {
-                dataType: "boolean",
-                title: "Public",
-                description: "Should this product be visible in the website",
-                longDescription: "Example of a long description hidden under a tooltip. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis bibendum turpis. Sed scelerisque ligula nec nisi pellentesque, eget viverra lorem facilisis. Praesent a lectus ac ipsum tincidunt posuere vitae non risus. In eu feugiat massa. Sed eu est non velit facilisis facilisis vitae eget ante. Nunc ut malesuada erat. Nullam sagittis bibendum porta. Maecenas vitae interdum sapien, ut aliquet risus. Donec aliquet, turpis finibus aliquet bibendum, tellus dui porttitor quam, quis pellentesque tellus libero non urna. Vestibulum maximus pharetra congue. Suspendisse aliquam congue quam, sed bibendum turpis. Aliquam eu enim ligula. Nam vel magna ut urna cursus sagittis. Suspendisse a nisi ac justo ornare tempor vel eu eros."
-            },
-            brand: {
-                dataType: "string",
-                title: "Brand",
-                validation: {
-                    required: true
-                }
-            },
-            description: {
-                dataType: "string",
-                title: "Description",
-                description: "Example of a markdown field",
-                config: {
-                    markdown: true
-                }
-            },
-            available: {
-                dataType: "boolean",
-                title: "Available",
-                columnWidth: 100
-            },
-            amazon_link: {
-                dataType: "string",
-                title: "Amazon link",
-                config: {
-                    url: true
-                }
-            },
-            added_on: {
-                dataType: "timestamp",
-                title: "Added on",
-                disabled: true,
-                autoValue: "on_create"
-            },
-            images: {
-                dataType: "array",
-                title: "Images",
-                of: {
-                    dataType: "string",
-                    config: {
-                        storageMeta: {
-                            mediaType: "image",
-                            storagePath: "images",
-                            acceptedFiles: ["image/*"],
-                            metadata: {
-                                cacheControl: "max-age=1000000"
-                            }
-                        }
-                    }
-                },
-                description: "This fields allows uploading multiple images at once"
-            },
-            related_products: {
-                dataType: "array",
-                title: "Related products",
-                description: "Reference to self",
-                of: {
-                    dataType: "reference",
-                    collectionPath: "products"
-                }
-            },
-            publisher: {
-                title: "Publisher",
-                description: "This is an example of a map property",
+            basicInfo: {
+                title: "Info",
                 dataType: "map",
+                disabled: true,
+                columnWidth:150,
                 properties: {
-                    name: {
+                    restaurantName: {
+                        disabled:true,
                         title: "Name",
                         dataType: "string"
                     },
-                    external_id: {
-                        title: "External id",
-                        dataType: "string"
-                    }
                 }
             },
-            min_known_price: {
-                dataType: "number",
-                title: "Min known price",
-                disabled: true,
-                description: "Minimum price this product has ever had"
-            },
-            prime_eligible: {
+            covidOpen: {
                 dataType: "boolean",
-                title: "Prime eligible",
-                disabled: true
+                title: "Available Now?",
             },
-            available_locales: {
-                title: "Available locales",
-                description:
-                    "This is an example of a disabled field that gets updated trough a Cloud Function, try changing a locale 'selectable' value",
-                longDescription: "Example of a long description hidden under a tooltip. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis bibendum turpis. Sed scelerisque ligula nec nisi pellentesque, eget viverra lorem facilisis. Praesent a lectus ac ipsum tincidunt posuere vitae non risus. In eu feugiat massa. Sed eu est non velit facilisis facilisis vitae eget ante. Nunc ut malesuada erat. Nullam sagittis bibendum porta. Maecenas vitae interdum sapien, ut aliquet risus. Donec aliquet, turpis finibus aliquet bibendum, tellus dui porttitor quam, quis pellentesque tellus libero non urna. Vestibulum maximus pharetra congue. Suspendisse aliquam congue quam, sed bibendum turpis. Aliquam eu enim ligula. Nam vel magna ut urna cursus sagittis. Suspendisse a nisi ac justo ornare tempor vel eu eros.",
+            description: {
+                title: "Description",
+                dataType: "string",
+                config:{multiline:true}
+            },
+            // restaurantName: {
+            //     dataType: "string",   
+            //     title: "Name",
+            // },
+            amenities: {
+                title: "Amenities",
+                dataType: "map",
+                properties: {
+                    altMilks: {
+                        title: "Alt Milks",
+                        dataType: "array",
+                        of: {
+                            dataType: "string",
+                            }
+                    },
+                    beans:{
+                        title: "Beans used",
+                        dataType: "string"
+                    },
+                    coffeeMachineModel:{
+                        title: "Coffee Machine",
+                        dataType: "string"
+                    },
+                    grinder:{
+                        title: "Grinder",
+                        dataType: "string"
+                    },
+                    location:{
+                        title: "Location",
+                        dataType: "string"
+                    },
+                    storeName:{
+                        title: "Store Name",
+                        dataType: "string"
+                    },
+                    storeType:{
+                        title: "Store Type",
+                        dataType: "string"
+                    },
+                    beansForSale: {
+                        dataType: "boolean",
+                        title: "Beans for Sale?",
+                    },
+                    outdoorSeating: {
+                        dataType: "boolean",
+                        title: "Outdoor Seating?",
+                    },
+                    tableSeating: {
+                        dataType: "boolean",
+                        title: "Table Seating?",
+                    },
+                    petsWelcome: {
+                        dataType: "boolean",
+                        title: "Pets Welcome?",
+                    },
+                    toilets: {
+                        dataType: "boolean",
+                        title: "Toilets?",
+                    },
+                    wifi: {
+                        dataType: "boolean",
+                        title: "Wi-Fi?",
+                    },
+                },
+            },
+            imgs: {
                 dataType: "array",
-                disabled: true,
-                of: {
-                    dataType: "string",
-                    config: {
-                        enumValues: locales
-                    }
-                }
-            },
-            uppercase_name: {
-                title: "Uppercase Name",
-                dataType: "string",
-                disabled: true,
-                description: "This field gets updated with a preSave hook"
-            }
-
-        },
-        defaultValues: {
-            currency: "EUR",
-            publisher: {
-                name: "Default publisher"
-            }
-        }
-    });
-
-    const blogSchema = buildSchema({
-        name: "Blog entry",
-        properties: {
-            name: {
-                title: "Name",
-                validation: { required: true },
-                dataType: "string"
-            },
-            gold_text: {
-                title: "Gold text",
-                description: "This field is using a custom component defined by the developer",
-                dataType: "string",
-                config: {
-                    field: CustomColorTextField,
-                    fieldProps: {
-                        color: "gold"
-                    }
-                }
-            },
-            long_text: {
-                title: "Long text",
-                description: "Example of a long text",
-                validation: { required: true },
-                dataType: "string",
-                config: {
-                    multiline: true
-                }
-            },
-            images: {
                 title: "Images",
-                dataType: "array",
+                validation: {
+                    // required: true,
+                    // min:1
+                },
+                description: "This fields allows uploading multiple images at once",
                 of: {
                     dataType: "string",
                     config: {
                         storageMeta: {
                             mediaType: "image",
-                            storagePath: "images",
+                            // TODO : fix image location by linking to name or id
+                            storagePath: "imgs/",
                             acceptedFiles: ["image/*"],
-                            metadata: {
-                                cacheControl: "max-age=1000000"
-                            }
+                            storeUrl:true,
+                            // metadata: {
+                            //     cacheControl: "max-age=1000000"
+                            // }
                         }
                     }
                 },
-                description: "This fields allows uploading multiple images at once and reordering"
             },
-            publish_date: {
-                title: "Publish date",
-                dataType: "timestamp"
-            },
-            priority: {
-                title: "Priority",
-                description: "This field allows the selection of Infinity as a value",
-                dataType: "number",
-                config: {
-                    fieldProps: {
-                        allowInfinity: true
-                    }
-                }
-            },
-            reviewed: {
-                title: "Reviewed",
-                dataType: "boolean",
-                config: {
-                    customPreview: CustomBooleanPreview
-                }
-            },
-            status: {
-                title: "Status",
-                validation: { required: true },
-                dataType: "string",
-                config: {
-                    enumValues: {
-                        published: "Published",
-                        draft: "Draft"
-                    }
-                }
-            },
-            content: {
-                title: "Content",
-                validation: { required: true },
-                dataType: "array",
-                of: {
-                    dataType: "string"
-                }
-            },
-            products: {
-                title: "Products",
-                validation: { required: true },
-                dataType: "array",
-                of: {
-                    dataType: "reference",
-                    collectionPath: "products",
-                    previewProperties: ["name", "main_image"]
-                }
-            },
-            tags: {
-                title: "Tags",
-                description: "Example of generic array",
+            billboard: {
+                title: "Billboard",
                 dataType: "array",
                 of: {
                     dataType: "string",
-                    config: {
-                        previewAsTag: true
                     }
+            },
+            included: {
+                title: "Drinks Included",
+                dataType: "array",
+                of: {
+                    dataType: "string",
+                    }
+            },
+            location: {
+                title: "Location",
+                description: "Lat & Long must ALWAYS be set. Either fullAddress or the broken-down address should be filled.",
+                dataType: "map",
+                validation: {
+                    required:true,
+                },
+                properties: {
+                    latitude: {
+                        title: "Latitude",
+                        dataType: "number",
+                        validation: {
+                            required:true,
+                        }
+                    },
+                    longitude: {
+                        title: "Longitude",
+                        dataType: "number",
+                        validation: {
+                            required:true,
+                        }
+                    },
+                    fullAddress:{
+                        title: "Full Address",
+                        dataType: "string",
+                    },
+                    addressLine1:{
+                        title: "Address Line 1",
+                        dataType: "string",
+                    },
+                    addressLine2:{
+                        title: "Address Line 2",
+                        dataType: "string",
+                    },
+                    city:{
+                        title: "City",
+                        dataType: "string",
+                    },
+                    postcode:{
+                        title: "Postcode",
+                        dataType: "string",
+                    },
+                    country:{
+                        title: "Country",
+                        dataType: "string",
+                    },
                 }
-            }
-        },
-        defaultValues: {
-            status: "draft",
-            tags: ["default tag"]
+            },
+            openingHours: {
+                title: "Opening Hours",
+                dataType: "map",
+                validation:{required:true},
+                properties: {
+                    monday: {
+                        title: "Monday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    tuesday: {
+                        title: "Tuesday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    wednesday: {
+                        title: "Wednesday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    thursday: {
+                        title: "Thursday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    friday: {
+                        title: "Friday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    saturday: {
+                        title: "Saturday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                    sunday: {
+                        title: "Sunday",
+                        dataType: "array",
+                        of: {
+                            dataType: "map",
+                            properties:{
+                                start:{
+                                    title: "Start Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                                end:{
+                                    title: "End Time",
+                                    dataType: "string",
+                                    validation:{
+                                        required: true,
+                                        matches:  /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+                                    }
+                                },
+                            }
+                            }
+                    },
+                },
+            },
+            // approved: {
+            //     dataType: "boolean",
+            //     title: "Approved",
+            //     columnWidth: 100,
+            //     validation: {
+                    
+            //     }
+            // },
+            // category: {
+            //     dataType: "string",
+            //     title: "Category",
+            //     config: {
+            //         enumValues: categories
+            //     }
+            // },
+        //     price: {
+        //         dataType: "number",
+        //         title: "Price",
+        //         validation: {
+        //             requiredMessage: "You must set a price between 0 and 1000",
+        //             min: 0,
+        //             max: 1000
+        //         },
+        //         config: {
+        //             customPreview: PriceTextPreview
+        //         },
+        //         description: "Price with range validation"
+        //     },
+
+        //     currency: {
+        //         dataType: "string",
+        //         title: "Currency",
+        //         config: {
+        //             enumValues: {
+        //                 EUR: "Euros",
+        //                 DOL: "Dollars"
+        //             }
+        //         },
+        //         validation: {
+        //             required: true
+        //         }
+        //     },
+        //     public: {
+        //         dataType: "boolean",
+        //         title: "Public",
+        //         description: "Should this partner be visible in the website",
+        //         longDescription: "Example of a long description hidden under a tooltip. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis bibendum turpis. Sed scelerisque ligula nec nisi pellentesque, eget viverra lorem facilisis. Praesent a lectus ac ipsum tincidunt posuere vitae non risus. In eu feugiat massa. Sed eu est non velit facilisis facilisis vitae eget ante. Nunc ut malesuada erat. Nullam sagittis bibendum porta. Maecenas vitae interdum sapien, ut aliquet risus. Donec aliquet, turpis finibus aliquet bibendum, tellus dui porttitor quam, quis pellentesque tellus libero non urna. Vestibulum maximus pharetra congue. Suspendisse aliquam congue quam, sed bibendum turpis. Aliquam eu enim ligula. Nam vel magna ut urna cursus sagittis. Suspendisse a nisi ac justo ornare tempor vel eu eros."
+        //     },
+        //     brand: {
+        //         dataType: "string",
+        //         title: "Brand",
+        //         validation: {
+        //             required: true
+        //         }
+        //     },
+        //     amazon_link: {
+        //         dataType: "string",
+        //         title: "Amazon link",
+        //         config: {
+        //             url: true
+        //         }
+        //     },
+        //     related_partners: {
+        //         dataType: "array",
+        //         title: "Related partners",
+        //         description: "Reference to self",
+        //         of: {
+        //             dataType: "reference",
+        //             collectionPath: "partners"
+        //         }
+        //     },
+        //     publisher: {
+        //         title: "Publisher",
+        //         description: "This is an example of a map property",
+        //         dataType: "map",
+        //         properties: {
+        //             name: {
+        //                 title: "Name",
+        //                 dataType: "string"
+        //             },
+        //             external_id: {
+        //                 title: "External id",
+        //                 dataType: "string"
+        //             }
+        //         }
+        //     },
+        //     min_known_price: {
+        //         dataType: "number",
+        //         title: "Min known price",
+        //         disabled: true,
+        //         description: "Minimum price this partner has ever had"
+        //     },
+        //     prime_eligible: {
+        //         dataType: "boolean",
+        //         title: "Prime eligible",
+        //         disabled: true
+        //     },
+        //     uppercase_name: {
+        //         title: "Uppercase Name",
+        //         dataType: "string",
+        //         disabled: true,
+        //         description: "This field gets updated with a preSave hook"
+        //     }
+
+        // },
+        // defaultValues: {
+        //     currency: "EUR",
+        //     publisher: {
+        //         name: "Default publisher"
+        //     }
         }
     });
+
+    const couponSchema = buildSchema({
+        name: "Coupon",
+        properties: {
+            timestamp: {
+                title: "Redeemed at",
+                dataType: "string",
+                disabled:true,
+            },
+            name: {
+                title: "Store",
+                disabled:true,
+                dataType: "string"
+            },
+            number: {
+                title: "Number",
+                dataType: "number"
+            },
+        }});
 
     const usersSchema = buildSchema({
         name: "User",
         properties: {
-            first_name: {
+            firstName: {
                 title: "First name",
                 dataType: "string"
             },
-            last_name: {
+            lastName: {
                 title: "Last name",
                 dataType: "string"
             },
             email: {
+                disabled:true,
                 title: "Email",
                 dataType: "string",
                 validation: {
                     email: true
                 }
             },
-            phone: {
-                title: "Phone",
+            createdAt: {
+                title: "Created At",
+                disabled:true,
                 dataType: "string"
             },
-            picture: {
-                title: "Picture",
-                dataType: "map",
-                properties: {
-                    large: {
-                        title: "Large",
-                        dataType: "string",
-                        config: {
-                            url: "image"
-                        },
-                        validation: {
-                            url: true
-                        }
-                    },
-                    thumbnail: {
-                        title: "Thumbnail",
-                        dataType: "string",
-                        config: {
-                            url: "image"
-                        },
-                        validation: {
-                            url: true
-                        }
-                    }
-                },
-                previewProperties: ["large"]
-            }
-        }
-    });
-
-    const productAdditionalColumn: AdditionalColumnDelegate<typeof productSchema> = {
-        id: "spanish_title",
-        title: "Spanish title",
-        builder: (entity: Entity<typeof productSchema>) =>
-            <AsyncPreviewComponent builder={
-                entity.reference.collection("locales")
-                    .doc("es")
-                    .get()
-                    .then((snapshot: any) => snapshot.get("name") as string)
-            }/>
-    };
-
-    const localeSchema = buildSchema({
-        customId: locales,
-        name: "Locale",
-        properties: {
-            name: {
-                title: "Name",
-                validation: { required: true },
-                dataType: "string"
-            },
-            description: {
-                title: "Description",
-                validation: { required: true },
-                dataType: "string",
-                config: {
-                    multiline: true
+            
+            couponCount: {
+                title: "Coupon Count",
+                dataType: "number",
+                validation: {
+                    min:0,
+                    max:50,
+                    integer:true
                 }
             },
-            selectable: {
-                title: "Selectable",
-                description: "Is this locale selectable",
-                longDescription: "Changing this value triggers a cloud function that updates the parent product",
-                dataType: "boolean"
+            trialCouponCount: {
+                title: "Trial Coupon Count",
+                dataType: "number",
+                validation: {
+                    min:0,
+                    max:10,
+                    integer:true
+                }
             },
-            video: {
-                title: "Video",
-                dataType: "string",
-                validation: { required: false },
-                config: {
-                    storageMeta: {
-                        mediaType: "video",
-                        storagePath: "videos",
-                        acceptedFiles: ["video/*"]
-                    }
+            trialEnds: {
+                title: "Trial Ends (Unix Timestamp)",
+                dataType: "number",
+                // disabled:true,
+                validation: {
+                    min: 1600000000000,
+                    integer:true
+                }
+            },
+            subscription: {
+                title: "Subscription",
+                disabled:true,
+                dataType: "map",
+                properties: {
+                    status: {
+                        title: "Status",
+                        dataType: "string",
+                    },
+                    nickname: {
+                        title: "Plan",
+                        dataType: "string",
+                    },
                 },
-                columnWidth: 400
-            }
+            },
+            // picture: {
+            //     title: "Picture",
+            //     dataType: "map",
+            //     properties: {
+            //         large: {
+            //             config: {
+            //                 url: "image"
+            //             },
+            //             validation: {
+            //                 url: true
+            //             }
+            //         },
+            //         thumbnail: {
+            //             title: "Thumbnail",
+            //             dataType: "string",
+            //             config: {
+            //                 url: "image"
+            //             },
+            //             validation: {
+            //                 url: true
+            //             }
+            //         }
+            //     },
+            //     previewProperties: ["large"]
+            // }
         }
     });
 
-    productSchema.onPreSave = ({
-                                   schema,
-                                   collectionPath,
-                                   id,
-                                   values,
-                                   status
-                               }: EntitySaveProps<typeof productSchema>) => {
-        values.uppercase_name = values.name.toUpperCase();
-        return values;
+    const partnerAdditionalColumn: AdditionalColumnDelegate<typeof partnerSchema> = {
+        id: "restaurantName",
+        title: "Store Name",
+        builder: (entity: Entity<typeof partnerSchema>) =>
+        entity.values.basicInfo.restaurantName
+            // <AsyncPreviewComponent builder={
+            //     entity.reference.collection("locales")
+            //         .doc("es")
+            //         .get()
+            //         .then((snapshot: any) => snapshot.get("name") as string)
+            // }/>
     };
 
-    productSchema.onSaveSuccess = (props) => {
+
+    // partnerSchema.onPreSave = ({
+    //                                schema,
+    //                                collectionPath,
+    //                                id,
+    //                                values,
+    //                                status
+    //                            }: EntitySaveProps<typeof partnerSchema>) => {
+    //     values.uppercase_name = values.name.toUpperCase();
+    //     if (
+    //         values.description != null || 
+    //         values.description != ''
+                
+    //         )
+    //     return values;
+    // };
+
+    partnerSchema.onSaveSuccess = (props) => {
         console.log("onSaveSuccess", props);
     };
 
-    productSchema.onDelete = (props) => {
-        console.log("onDelete", props);
-    };
+    // partnerSchema.onDelete = (props) => {
+    //     console.log("onDelete", props);
+    // };
 
-    const testEntitySchema = buildSchema({
-        customId: true,
-        name: "Test entity",
-        properties: {
-            title: {
-                dataType: "string",
-                title: "Title"
-            },
-            tags: {
-                title: "Tags",
-                dataType: "array",
-                of: {
-                    dataType: "string"
-                }
-            },
-            product: {
-                title: "Product",
-                dataType: "reference",
-                collectionPath: "products",
-                previewProperties: ["name", "main_image"]
-            },
-            available_locales: {
-                title: "Available locales",
-                description:
-                    "This is an example of a disabled field that gets updated trough a Cloud Function, try changing a locale 'selectable' value",
-                longDescription: "Example of a long description hidden under a tooltip. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis bibendum turpis. Sed scelerisque ligula nec nisi pellentesque, eget viverra lorem facilisis. Praesent a lectus ac ipsum tincidunt posuere vitae non risus. In eu feugiat massa. Sed eu est non velit facilisis facilisis vitae eget ante. Nunc ut malesuada erat. Nullam sagittis bibendum porta. Maecenas vitae interdum sapien, ut aliquet risus. Donec aliquet, turpis finibus aliquet bibendum, tellus dui porttitor quam, quis pellentesque tellus libero non urna. Vestibulum maximus pharetra congue. Suspendisse aliquam congue quam, sed bibendum turpis. Aliquam eu enim ligula. Nam vel magna ut urna cursus sagittis. Suspendisse a nisi ac justo ornare tempor vel eu eros.",
-                dataType: "array",
-                of: {
-                    dataType: "string",
-                    config: {
-                        enumValues: locales
-                    }
-                }
-            },
-            available_dates: {
-                dataType: "array",
-                title: "Available Dates",
-                of: {
-                    dataType: "timestamp"
-                }
-            },
-            images: {
-                title: "Images",
-                dataType: "array",
-                of: {
-                    dataType: "string",
-                    config: {
-                        storageMeta: {
-                            mediaType: "image",
-                            storagePath: "images",
-                            acceptedFiles: ["image/*"]
-                        }
-                    }
-                }
-            },
-            image: {
-                title: "Image",
-                dataType: "string",
-                config: {
-                    storageMeta: {
-                        mediaType: "image",
-                        storagePath: "test",
-                        acceptedFiles: ["image/*"]
-                    }
-                }
-            },
-            mark: {
-                title: "Mark",
-                dataType: "string",
-                config: {
-                    markdown: true
-                }
-            },
-            created_at: {
-                title: "Created at",
-                dataType: "timestamp",
-                autoValue: "on_create"
-            },
-            updated_on: {
-                title: "Updated on",
-                dataType: "timestamp",
-                autoValue: "on_update"
-            },
-            description: {
-                title: "Description",
-                dataType: "string",
-                config: {
-                    multiline: true
-                }
-            },
-            search_adjacent: {
-                title: "Search adjacent",
-                dataType: "boolean"
-            },
-            difficulty: {
-                title: "Difficulty",
-                dataType: "number"
-            },
-            range: {
-                title: "Range",
-                validation: {
-                    min: 0,
-                    max: 3
-                },
-                dataType: "number"
-            },
-            pdf: {
-                title: "Pdf",
-                dataType: "string",
-                config: {
-                    storageMeta: {
-                        storagePath: "test"
-                    }
-                }
-            }
-        }
-    });
 
-    const localeCollection: EntityCollectionView<typeof localeSchema> =
-        buildCollection({
-            name: "Locales",
-            relativePath: "locales",
-            deleteEnabled: true,
-            schema: localeSchema,
-            defaultSize: "l"
-        })
-    ;
 
-    const productsCollection = buildCollection({
-        relativePath: "products",
-        schema: productSchema,
-        name: "Products",
-        textSearchDelegate: productsSearchDelegate,
-        additionalColumns: [productAdditionalColumn],
-        subcollections: [localeCollection],
-        excludedProperties: ["images", "related_products"],
-        filterableProperties: ["price", "available_locales"]
+    const partnersCollection = buildCollection({
+        relativePath: "partners",
+        schema: partnerSchema,
+        name: "partners",
+        textSearchDelegate: partnersSearchDelegate,
+        // additionalColumns: [partnerAdditionalColumn],
+        // subcollections: [localeCollection],
+        // excludedProperties: ["images"],
+        filterableProperties: ["approved", "covidOpen", "restaurantName", "basicInfo"],
+        pagination:true,
+        inlineEditing:false,
+        additionalColumns: [partnerAdditionalColumn],
+        deleteEnabled:false,
     });
 
     const usersCollection = buildCollection({
@@ -637,85 +677,124 @@ function App() {
         schema: usersSchema,
         name: "Users",
         textSearchDelegate: usersSearchDelegate,
-        properties: ["first_name", "last_name", "email", "phone", "picture"]
+        defaultSize:"xs",
+        pagination:true,
+        inlineEditing:false,
+        deleteEnabled:false,
+        // deleteEnabled:
+        
+        filterableProperties:["email"],
+        subcollections: [
+            buildCollection({
+                name: "Coupons",
+                relativePath: "coupons",
+                schema: couponSchema
+            })
+        ],
+        properties: ["firstName", "lastName", "email", "couponCount", "trialCouponCount", ]
     });
 
-    const blogCollection = buildCollection({
-        relativePath: "blog",
-        schema: blogSchema,
-        name: "Blog",
-        group: "Content",
-        textSearchDelegate: blogSearchDelegate,
-        properties: ["name", "images", "status", "reviewed", "products", "long_text"],
-        filterableProperties: ["name", "status"],
-        initialFilter: {
-            "status": ["==", "published"]
-        }
-    });
+    
+
+    // const blogCollection = buildCollection({
+    //     relativePath: "blog",
+    //     schema: blogSchema,
+    //     name: "Blog",
+    //     group: "Content",
+    //     textSearchDelegate: blogSearchDelegate,
+    //     properties: ["name", "images", "status", "reviewed", "partners", "long_text"],
+    //     filterableProperties: ["name", "status"],
+    //     initialFilter: {
+    //         "status": ["==", "published"]
+    //     }
+    // });
 
     const navigation: EntityCollectionView[] = [
-        productsCollection,
+        partnersCollection,
         usersCollection,
-        blogCollection
+        // blogCollection
     ];
 
-    if (process.env.NODE_ENV !== "production") {
-        navigation.push(buildCollection({
-            relativePath: "test_entity",
-            schema: testEntitySchema,
-            group: "Test group",
-            name: "Test entity",
-            filterableProperties: ["difficulty", "search_adjacent", "description"],
-            subcollections: [{
-                relativePath: "test_subcollection",
-                schema: testEntitySchema,
-                name: "Test entity",
-                filterableProperties: ["difficulty", "search_adjacent", "description"]
-            }]
-        }));
-    }
+    // if (process.env.NODE_ENV !== "production") {
+    //     navigation.push(buildCollection({
+    //         relativePath: "test_entity",
+    //         schema: testEntitySchema,
+    //         group: "Test group",
+    //         name: "Test entity",
+    //         filterableProperties: ["difficulty", "search_adjacent", "description"],
+    //         subcollections: [{
+    //             relativePath: "test_subcollection",
+    //             schema: testEntitySchema,
+    //             name: "Test entity",
+    //             filterableProperties: ["difficulty", "search_adjacent", "description"]
+    //         }]
+    //     }));
+    // }
 
     const myAuthenticator: Authenticator = (user?: firebase.User) => {
-        console.log("Allowing access to", user?.email);
-        return true;
+         const docRef = firebase.firestore().collection("roles").doc(user?.uid);
+        
+        const bool = docRef.get().then(function(doc) {
+            if (doc.exists) {
+                console.log("Document data:", doc.data());
+                return true;
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+                return false;
+            }
+        }).catch(function(error) {
+            console.log("Error getting document:", error);
+            return false;
+        });
+        
+        
+        
+        // if (user?.uid)
+        
+        
+        // where('id',"==",user?.uid).where('role','==','admin').get;
+        // console.log("Allowing access to", user?.email);
+        return bool;
     };
 
-    const githubLink = (
-        <Tooltip
-            title="See this project on GitHub. This button is only present in this demo">
-            <IconButton
-                href={"https://github.com/Camberi/firecms"}
-                rel="noopener noreferrer"
-                target="_blank"
-                component={"a"}>
-                <GitHubIcon/>
-            </IconButton>
-        </Tooltip>
-    );
-
-    const additionalViews: AdditionalView[] = [{
-        path: "additional",
-        name: "Additional",
-        group: "Content",
-        view: <ExampleAdditionalView/>
-    }];
+    // const additionalViews: AdditionalView[] = [{
+    //     path: "additional",
+    //     name: "Additional",
+    //     group: "Content",
+    //     view: <ExampleAdditionalView/>
+    // }];
 
     const onFirebaseInit = (config:Object) => {
+        firebase.firestore().enablePersistence()
+        .catch(function(err) {
+            if (err.code == 'failed-precondition') {
+                // Multiple tabs open, persistence can only be enabled
+                // in one tab at a a time.
+                // ...
+            } else if (err.code == 'unimplemented') {
+                // The current browser does not support all of the
+                // features required to enable persistence
+                // ...
+            }
+        });
+      
         // firebase.firestore().useEmulator("localhost", 8080);
     };
 
     return <CMSApp
-        name={"My Online Shop"}
+        name={"Coffy DB Admin"}
         authentication={myAuthenticator}
-        allowSkipLogin={true}
+        allowSkipLogin={false}
         logo={logo}
         navigation={navigation}
-        additionalViews={additionalViews}
-        // In the production environment, the configuration is fetched from the environment automatically
+        // additionalViews={additionalViews}
+        // In the partnerion environment, the configuration is fetched from the environment automatically
         firebaseConfig={firebaseConfig}
         onFirebaseInit={onFirebaseInit}
-        // firebaseConfig={process.env.NODE_ENV !== "production" ? firebaseConfig : undefined}
-        toolbarExtraWidget={githubLink}
+        primaryColor={"#e34819"}
+        // firebaseConfig={process.env.NODE_ENV !== "partnerion" ? firebaseConfig : undefined}
+        // toolbarExtraWidget={githubLink}
     />;
 }
 
