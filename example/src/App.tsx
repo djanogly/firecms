@@ -48,6 +48,11 @@ function App() {
                     },
                 }
             },
+            approved: {
+                dataType: "boolean",
+                title: "Approved?",
+                disabled:true
+            },
             covidOpen: {
                 dataType: "boolean",
                 title: "Available Now?",
@@ -133,12 +138,16 @@ function App() {
                 of: {
                     dataType: "string",
                     config: {
+                        fieldProps:{
+                            
+                        },
                         storageMeta: {
                             mediaType: "image",
                             // TODO : fix image location by linking to name or id
-                            storagePath: "imgs/",
+                            storagePath: "imgs/_unsorted/",
                             acceptedFiles: ["image/*"],
                             storeUrl:true,
+
                             // metadata: {
                             //     cacheControl: "max-age=1000000"
                             // }
@@ -390,6 +399,10 @@ function App() {
                     },
                 },
             },
+            // restaurantName:{
+            //     dataType: "string",
+            //     title: "Restaurant Name",
+            // }
             // approved: {
             //     dataType: "boolean",
             //     title: "Approved",
@@ -617,18 +630,18 @@ function App() {
         }
     });
 
-    const partnerAdditionalColumn: AdditionalColumnDelegate<typeof partnerSchema> = {
-        id: "restaurantName",
-        title: "Store Name",
-        builder: (entity: Entity<typeof partnerSchema>) =>
-        entity.values.basicInfo.restaurantName
-            // <AsyncPreviewComponent builder={
-            //     entity.reference.collection("locales")
-            //         .doc("es")
-            //         .get()
-            //         .then((snapshot: any) => snapshot.get("name") as string)
-            // }/>
-    };
+    // const partnerAdditionalColumn: AdditionalColumnDelegate<typeof partnerSchema> = {
+    //     id: "restaurantName",
+    //     title: "Store Name",
+    //     builder: (entity: Entity<typeof partnerSchema>) =>
+    //     entity.values.basicInfo.restaurantName
+    //         // <AsyncPreviewComponent builder={
+    //         //     entity.reference.collection("locales")
+    //         //         .doc("es")
+    //         //         .get()
+    //         //         .then((snapshot: any) => snapshot.get("name") as string)
+    //         // }/>
+    // };
 
 
     // partnerSchema.onPreSave = ({
@@ -638,12 +651,17 @@ function App() {
     //                                values,
     //                                status
     //                            }: EntitySaveProps<typeof partnerSchema>) => {
-    //     values.uppercase_name = values.name.toUpperCase();
-    //     if (
-    //         values.description != null || 
-    //         values.description != ''
+    //     var arr=values.imgs;
+    //     const partnerId =values.partnerId;
+            
+    //     var resultArr = arr.map(function(x:string){return x.replace(/partnerId/g, partnerId);});
+    //     values.imgs = resultArr;
+    //     //  = values.name.toUpperCase();
+    //     // if (
+    //     //     values.description != null || 
+    //     //     values.description != ''
                 
-    //         )
+    //     //     )
     //     return values;
     // };
 
@@ -662,13 +680,13 @@ function App() {
         schema: partnerSchema,
         name: "partners",
         textSearchDelegate: partnersSearchDelegate,
+        defaultSize:"s",
+        // excludedProperties
         // additionalColumns: [partnerAdditionalColumn],
-        // subcollections: [localeCollection],
         // excludedProperties: ["images"],
-        filterableProperties: ["approved", "covidOpen", "restaurantName", "basicInfo"],
+        filterableProperties: ["approved", "covidOpen"],
         pagination:true,
         inlineEditing:false,
-        additionalColumns: [partnerAdditionalColumn],
         deleteEnabled:false,
     });
 
@@ -682,8 +700,7 @@ function App() {
         inlineEditing:false,
         deleteEnabled:false,
         // deleteEnabled:
-        
-        filterableProperties:["email"],
+        filterableProperties:["email", "firstName", "lastName","couponCount", "trialEnds"],
         subcollections: [
             buildCollection({
                 name: "Coupons",
@@ -783,7 +800,7 @@ function App() {
     };
 
     return <CMSApp
-        name={"Coffy DB Admin"}
+        name={"Coffy Admin"}
         authentication={myAuthenticator}
         allowSkipLogin={false}
         logo={logo}

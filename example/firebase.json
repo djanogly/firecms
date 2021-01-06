@@ -1,5 +1,6 @@
 {
     "hosting": {
+        "site": "coffyadmin",
         "public": "build",
         "ignore": [
             "firebase.json",
