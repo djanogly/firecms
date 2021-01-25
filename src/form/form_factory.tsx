@@ -24,9 +24,9 @@ import ReferenceField from "./fields/ReferenceField";
 import MapField from "./fields/MapField";
 import ArrayDefaultField from "./fields/ArrayDefaultField";
 import DisabledField from "./fields/DisabledField";
-import { CMSFieldProps, FormFieldProps } from "./form_props";
+import { CMSFieldProps, FormFieldProps } from "../models/form_props";
 import { useClipboard } from "use-clipboard-hook";
-import { useSnackbarContext } from "../contexts/SnackbarContext";
+import { useSnackbarController } from "../contexts/SnackbarContext";
 import MarkDownField from "./fields/MarkdownField";
 import { useAppConfigContext } from "../contexts/AppConfigContext";
 import { CMSAppProps } from "../CMSAppProps";
@@ -163,13 +163,13 @@ function buildFieldInternal<P extends Property<T>, T = any>(
 }
 
 
-export function createCustomIdField<S extends EntitySchema>(schema: EntitySchema, formType: EntityStatus, onChange: Function, error: boolean, entity: Entity<S> | undefined) {
+export function createCustomIdField<S extends EntitySchema>(schema: EntitySchema, entityStatus: EntityStatus, onChange: Function, error: boolean, entity: Entity<S> | undefined) {
 
-    const disabled = formType !== EntityStatus.new || !schema.customId;
+    const disabled = entityStatus === EntityStatus.existing || !schema.customId;
 
     const hasEnumValues = typeof schema.customId === "object";
 
-    const snackbarContext = useSnackbarContext();
+    const snackbarContext = useSnackbarController();
     const { ref, copy, cut } = useClipboard({
         onSuccess: (text) => snackbarContext.open({
             type: "success",
@@ -210,20 +210,21 @@ export function createCustomIdField<S extends EntitySchema>(schema: EntitySchema
         undefined;
 
     const fieldProps: any = {
-        label: (formType === EntityStatus.new && disabled) ? "Id is set automatically" : "Id",
+        label: (entityStatus === EntityStatus.new || entityStatus === EntityStatus.copy && disabled) ? "Id is set automatically" : "Id",
         disabled: disabled,
         name: "id",
         type: null,
-        value: entity ? entity.id : undefined,
+        value: entity && entityStatus === EntityStatus.existing ? entity.id : undefined,
         variant: "filled"
     };
     return (
-        <FormControl fullWidth error={error}
+        <FormControl fullWidth
+                     error={error}
                      {...fieldProps}
                      key={"custom-id-field"}>
 
             {hasEnumValues && schema.customId &&
-            <React.Fragment>
+            <>
                 <InputLabel id={`id-label`}>{fieldProps.label}</InputLabel>
                 <MuiSelect
                     labelId={`id-label`}
@@ -237,7 +238,7 @@ export function createCustomIdField<S extends EntitySchema>(schema: EntitySchema
                             {`${key} - ${label}`}
                         </MenuItem>)}
                 </MuiSelect>
-            </React.Fragment>}
+            </>}
 
             {!hasEnumValues &&
             <MuiTextField {...fieldProps}

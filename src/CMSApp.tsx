@@ -22,7 +22,7 @@ import "firebase/firestore";
 import "typeface-space-mono";
 
 import { CircularProgressCenter } from "./components";
-import { Authenticator } from "./authenticator";
+import { Authenticator } from "./models/authenticator";
 import { blue, pink, red } from "@material-ui/core/colors";
 
 import { SelectedEntityProvider } from "./side_dialog/SelectedEntityContext";
@@ -154,11 +154,6 @@ export function CMSApp(props: CMSAppProps) {
             MuiFormControlLabel: {
                 label: {
                     width: "100%"
-                }
-            },
-            MuiDialog: {
-                paper: {
-                    height: "100%"
                 }
             }
         }

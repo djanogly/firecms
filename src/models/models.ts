@@ -1,7 +1,10 @@
 import * as React from "react";
 import { TextSearchDelegate } from "./text_search_delegate";
-import { CMSFieldProps } from "./form/form_props";
-import { PreviewComponentFactoryProps, PreviewComponentProps } from "./preview";
+import { CMSFieldProps } from "./form_props";
+import {
+    PreviewComponentFactoryProps,
+    PreviewComponentProps
+} from "../preview";
 import firebase from "firebase/app";
 
 /**
@@ -109,7 +112,27 @@ export interface EntityCollectionView<S extends EntitySchema = EntitySchema,
      */
     initialFilter?: FilterValues<S>;
 
+    /**
+     * Builder for rendering additional components such as buttons in the
+     * collection toolbar
+     * @param entityCollectionView this collection view
+     * @param selectedEntities current selected entities by the end user or
+     * undefined if none
+     */
+    extraActions?: (extraActionsParams: ExtraActionsParams<S>) => React.ReactNode;
+
+    /**
+     * Are the entities in this collection selectable. Defaults to true
+     */
+    selectionEnabled?: boolean;
+
 }
+
+export type ExtraActionsParams<S extends EntitySchema = EntitySchema> = {
+    view: EntityCollectionView,
+    selectedEntities?: Entity<S>[]
+};
+
 
 /**
  * Sizes in which a collection can be rendered
@@ -174,6 +197,15 @@ export interface EntitySchema<Key extends string = string, P extends Properties<
 
     /**
      * Hook called after the entity is deleted in Firestore.
+     * If you throw an error in this method the process stops, and an
+     * error snackbar gets displayed.
+     *
+     * @param entityDeleteProps
+     */
+    onPreDelete?(entityDeleteProps: EntityDeleteProps<this>): void;
+
+    /**
+     * Hook called after the entity is deleted in Firestore.
      *
      * @param entityDeleteProps
      */
@@ -194,24 +226,30 @@ export interface EntitySaveProps<S extends EntitySchema,
 }
 
 /**
- * Parameters passed to hooks when an entity is saved
+ * Parameters passed to hooks when an entity is deleted
  */
 export interface EntityDeleteProps<S extends EntitySchema,
     Key extends string = Extract<keyof S["properties"], string>,
     P extends Properties<Key> = S["properties"]> {
+
     /**
      * Firestore path of the parent collection
      */
     collectionPath: string;
+
     /**
      * Deleted entity id
      */
     id: string;
+
     /**
      * Deleted entity
      */
     entity: Entity<S>;
 
+    /**
+     * Schema of the entity being deleted
+     */
     schema: S;
 }
 
@@ -248,7 +286,7 @@ export function buildProperties<Key extends string>(properties: Properties<Key>)
 /**
  * New or existing status
  */
-export enum EntityStatus { new = "new", existing = "existing"}
+export enum EntityStatus { new = "new", existing = "existing", copy = "copy"}
 
 /**
  * Representation of an entity fetched from Firestore
@@ -261,7 +299,7 @@ export interface Entity<S extends EntitySchema,
     values: EntityValues<S, P, Key>;
 }
 
-type DataType =
+export type DataType =
     | "number"
     | "string"
     | "boolean"
@@ -321,7 +359,7 @@ export interface AdditionalColumnDelegate<S extends EntitySchema,
 /**
  * Interface including all common properties of a CMS property
  */
-export interface BaseProperty {
+interface BaseProperty {
 
     /**
      * Firestore datatype of the property
@@ -593,7 +631,7 @@ export interface NumberPropertyValidationSchema extends PropertyValidationSchema
 /**
  * Validation rules for strings
  */
-interface StringPropertyValidationSchema extends PropertyValidationSchema {
+export interface StringPropertyValidationSchema extends PropertyValidationSchema {
     length?: number;
     min?: number;
     max?: number;
@@ -608,7 +646,7 @@ interface StringPropertyValidationSchema extends PropertyValidationSchema {
 /**
  * Validation rules for dates
  */
-interface DatePropertyValidationSchema extends PropertyValidationSchema {
+export interface DatePropertyValidationSchema extends PropertyValidationSchema {
     min?: Date;
     max?: Date;
 }
@@ -616,7 +654,7 @@ interface DatePropertyValidationSchema extends PropertyValidationSchema {
 /**
  * Validation rules for arrays
  */
-interface ArrayPropertyValidationSchema extends PropertyValidationSchema {
+export interface ArrayPropertyValidationSchema extends PropertyValidationSchema {
     min?: number;
     max?: number;
 }

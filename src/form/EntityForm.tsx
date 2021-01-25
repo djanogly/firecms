@@ -8,10 +8,15 @@ import {
     makeStyles,
     Typography
 } from "@material-ui/core";
-import { Entity, EntitySchema, EntityStatus, EntityValues } from "../models";
+import {
+    Entity,
+    EntitySchema,
+    EntityStatus,
+    EntityValues
+} from "../models";
 import { Form, Formik, FormikHelpers } from "formik";
 import { createCustomIdField, createFormField } from "./form_factory";
-import { initEntityValues } from "../firebase/firestore";
+import { initEntityValues } from "../models/firestore";
 import { getYupObjectSchema } from "./validation";
 import deepEqual from "deep-equal";
 import { ErrorFocus } from "./ErrorFocus";
@@ -77,7 +82,7 @@ interface EntityFormProps<S extends EntitySchema> {
      */
     onModified(dirty: boolean): void;
 
-    containerRef: React.RefObject<HTMLDivElement>
+    containerRef: React.RefObject<HTMLDivElement>;
 
 }
 
@@ -99,18 +104,24 @@ function EntityForm<S extends EntitySchema>({
      * compare them with underlying changes in Firestore
      */
     let baseFirestoreValues: EntityValues<S>;
-    if (status === EntityStatus.new) {
-        baseFirestoreValues = (initEntityValues(schema));
-    } else if (status === EntityStatus.existing && entity) {
+    if ((status === EntityStatus.existing || status === EntityStatus.copy) && entity) {
         baseFirestoreValues = entity.values as EntityValues<S>;
+    } else if (status === EntityStatus.new) {
+        baseFirestoreValues = (initEntityValues(schema));
     } else {
         throw new Error("Form configured wrong");
     }
 
+
     const [customId, setCustomId] = React.useState<string | undefined>(undefined);
     const [customIdError, setCustomIdError] = React.useState<boolean>(false);
     const [savingError, setSavingError] = React.useState<any>();
+    const [isModified, setIsModified] = React.useState<boolean>(false);
     const [initialValues, setInitialValues] = React.useState<EntityValues<S>>(entity?.values || initEntityValues(schema));
+
+    useEffect(() => {
+        onModified(isModified);
+    }, [isModified]);
 
     let underlyingChanges: Partial<EntityValues<S>> | undefined;
     if (initialValues) {
@@ -126,16 +137,17 @@ function EntityForm<S extends EntitySchema>({
             .reduce((a, b) => ({ ...a, ...b }), {}) as EntityValues<S>;
     }
 
-    const mustSetCustomId: boolean = status === EntityStatus.new && !!schema.customId;
+    const mustSetCustomId: boolean = (status === EntityStatus.new || status === EntityStatus.copy) && !!schema.customId;
 
-    function saveValues(values: EntityValues<S>, actions: FormikHelpers<EntityValues<S>>) {
+    function saveValues(values: EntityValues<S>, formikActions: FormikHelpers<EntityValues<S>>) {
 
         if (mustSetCustomId && !customId) {
             console.error("Missing custom Id");
             setCustomIdError(true);
-            actions.setSubmitting(false);
+            formikActions.setSubmitting(false);
             return;
         }
+
         setSavingError(null);
         setCustomIdError(false);
 
@@ -143,7 +155,7 @@ function EntityForm<S extends EntitySchema>({
         if (status === EntityStatus.existing) {
             if (!entity?.id) throw Error("Form misconfiguration when saving, no id for existing entity");
             id = entity.id;
-        } else if (status === EntityStatus.new) {
+        } else if (status === EntityStatus.new || status === EntityStatus.copy) {
             if (schema.customId) {
                 if (!customId) throw Error("Form misconfiguration when saving, customId should be set");
                 id = customId;
@@ -155,14 +167,14 @@ function EntityForm<S extends EntitySchema>({
         onEntitySave(schema, collectionPath, id, values)
             .then(_ => {
                 setInitialValues(values);
-                actions.setTouched({});
+                formikActions.setTouched({});
             })
             .catch(e => {
                 console.error(e);
                 setSavingError(e);
             })
             .finally(() => {
-                actions.setSubmitting(false);
+                formikActions.setSubmitting(false);
             });
 
     }
@@ -170,12 +182,13 @@ function EntityForm<S extends EntitySchema>({
     const validationSchema = getYupObjectSchema(schema.properties);
 
     function buildButtons(isSubmitting: boolean) {
+        const disabled = isSubmitting || (!isModified && status === EntityStatus.existing);
         return <Box textAlign="right">
             {status === EntityStatus.existing &&
             <Button
                 variant="text"
                 color="primary"
-                disabled={isSubmitting}
+                disabled={disabled}
                 className={classes.button}
                 type="reset"
             >
@@ -185,10 +198,12 @@ function EntityForm<S extends EntitySchema>({
                 variant="contained"
                 color="primary"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={disabled}
                 className={classes.button}
             >
-                Save
+                {status === EntityStatus.existing && "Save"}
+                {status === EntityStatus.copy && "Create copy"}
+                {status === EntityStatus.new && "Create"}
             </Button>
         </Box>;
     }
@@ -201,12 +216,17 @@ function EntityForm<S extends EntitySchema>({
             validate={(values) => console.debug("Validating", values)}
             onReset={() => onDiscard && onDiscard()}
         >
-            {({ values, touched, setFieldValue, setFieldTouched, handleSubmit, isSubmitting }) => {
+            {({
+                  values,
+                  touched,
+                  setFieldValue,
+                  setFieldTouched,
+                  handleSubmit,
+                  isSubmitting
+              }) => {
 
                 const modified = !deepEqual(entity?.values, values);
-                useEffect(() => {
-                    onModified(modified);
-                }, [modified]);
+                setIsModified(modified);
 
                 if (underlyingChanges && entity) {
                     // we update the form fields from the Firestore data

@@ -1,12 +1,9 @@
 import React, { useContext, useState } from "react";
-import { Box, Snackbar } from "@material-ui/core";
+import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert/Alert";
 
 const DEFAULT_STATE = {
     isOpen: false,
-    type: undefined,
-    title: undefined,
-    message: undefined,
     close: () => {
     },
     open: (props: {
@@ -18,12 +15,21 @@ const DEFAULT_STATE = {
 
 type MessageType = "success" | "info" | "warning" | "error";
 
-export type SnackbarState = {
+export type SnackbarController = {
+    /**
+     * Is there currently an open snackbar
+     */
     isOpen: boolean;
-    type?: MessageType;
-    title?: string;
-    message?: string;
+
+    /**
+     * Close the currently open snackbar
+     */
     close: () => void;
+
+    /**
+     * Display a new snackbar. You need to specify the type and message.
+     * You can optionally specify a title
+     */
     open: (props: {
         type: MessageType;
         title?: string;
@@ -31,8 +37,8 @@ export type SnackbarState = {
     }) => void;
 };
 
-export const SnackbarContext = React.createContext<SnackbarState>(DEFAULT_STATE);
-export const useSnackbarContext = () => useContext(SnackbarContext);
+export const SnackbarContext = React.createContext<SnackbarController>(DEFAULT_STATE);
+export const useSnackbarController = () => useContext<SnackbarController>(SnackbarContext);
 
 interface ISelectedEntityProviderProps {
     children: React.ReactNode;
@@ -68,9 +74,6 @@ export const SnackbarProvider: React.FC<ISelectedEntityProviderProps> = ({ child
         <SnackbarContext.Provider
             value={{
                 isOpen,
-                title,
-                message,
-                type,
                 close,
                 open
             }}

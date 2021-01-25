@@ -11,8 +11,9 @@ import {
     Entity,
     // Entity,
     EntityCollectionView,
-    // EntitySaveProps,
-    // EnumValues
+    EntitySaveProps,
+    EnumValues,
+    // ExtraActionsParams
 } from "@camberi/firecms";
 // import PriceTextPreview from "./custom_preview/PriceTextPreview";
 // import CustomColorTextField from "./custom_field/CustomColorTextField";
@@ -28,9 +29,13 @@ import firebase from "firebase";
 // import { ExampleAdditionalView } from "./ExampleAdditionalView";
 import logo from "./images/coffy_logo.png";
 import { fstat } from "fs";
+import {  IconButton, Tooltip } from "@material-ui/core";
+import GitHubIcon from "@material-ui/icons/GitHub";
+import { ExampleAdditionalView } from "./ExampleAdditionalView";
+import { SampleExtraActions } from "./SampleExtraActions";
 
 
-function App() {
+function SampleApp() {
 
     
 
@@ -611,7 +616,11 @@ function App() {
     //     console.log("onDelete", props);
     // };
 
-
+    // const productExtraActionBuilder = ({ view, selectedEntities}:ExtraActionsParams) => {
+    //     return (
+    //         <SampleExtraActions selectedEntities={selectedEntities}/>
+    //     );
+    // };
 
     const partnersCollection = buildCollection({
         relativePath: "partners",
@@ -734,8 +743,6 @@ function App() {
                 // ...
             }
         });
-      
-        // firebase.firestore().useEmulator("localhost", 8080);
     };
 
     return <CMSApp
@@ -754,4 +761,5 @@ function App() {
     />;
 }
 
-export default App;
+export default SampleApp;
+
