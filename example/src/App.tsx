@@ -2,30 +2,32 @@ import React from "react";
 import { firebaseConfig } from "./firebase_config";
 import {
     AdditionalColumnDelegate,
-    AdditionalView,
-    AsyncPreviewComponent,
+    // AdditionalView,
+    // AsyncPreviewComponent,
     Authenticator,
     buildCollection,
     buildSchema,
     CMSApp,
     Entity,
+    // Entity,
     EntityCollectionView,
-    EntitySaveProps,
-    EnumValues
+    // EntitySaveProps,
+    // EnumValues
 } from "@camberi/firecms";
-import PriceTextPreview from "./custom_preview/PriceTextPreview";
-import CustomColorTextField from "./custom_field/CustomColorTextField";
-import CustomBooleanPreview from "./custom_preview/CustomBooleanPreview";
+// import PriceTextPreview from "./custom_preview/PriceTextPreview";
+// import CustomColorTextField from "./custom_field/CustomColorTextField";
+// import CustomBooleanPreview from "./custom_preview/CustomBooleanPreview";
 import {
     // blogSearchDelegate,
     partnersSearchDelegate,
     usersSearchDelegate
 } from "./algolia_utils";
 import firebase from "firebase";
-import { IconButton, Tooltip } from "@material-ui/core";
+// import { IconButton, Tooltip } from "@material-ui/core";
 // import GitHubIcon from "@material-ui/icons/GitHub";
-import { ExampleAdditionalView } from "./ExampleAdditionalView";
+// import { ExampleAdditionalView } from "./ExampleAdditionalView";
 import logo from "./images/coffy_logo.png";
+import { fstat } from "fs";
 
 
 function App() {
@@ -47,11 +49,6 @@ function App() {
                         dataType: "string"
                     },
                 }
-            },
-            approved: {
-                dataType: "boolean",
-                title: "Approved?",
-                disabled:true
             },
             covidOpen: {
                 dataType: "boolean",
@@ -182,6 +179,9 @@ function App() {
                         dataType: "number",
                         validation: {
                             required:true,
+                            integer:false,
+                            min: 50,
+                            max: 61,
                         }
                     },
                     longitude: {
@@ -189,6 +189,9 @@ function App() {
                         dataType: "number",
                         validation: {
                             required:true,
+                            integer:false,
+                            min: -8,
+                            max: 2,
                         }
                     },
                     fullAddress:{
@@ -213,6 +216,10 @@ function App() {
                     },
                     country:{
                         title: "Country",
+                        dataType: "string",
+                    },
+                    phone:{
+                        title: "Store Phone Number",
                         dataType: "string",
                     },
                 }
@@ -399,120 +406,17 @@ function App() {
                     },
                 },
             },
-            // restaurantName:{
-            //     dataType: "string",
-            //     title: "Restaurant Name",
-            // }
-            // approved: {
-            //     dataType: "boolean",
-            //     title: "Approved",
-            //     columnWidth: 100,
-            //     validation: {
-                    
-            //     }
-            // },
-            // category: {
-            //     dataType: "string",
-            //     title: "Category",
-            //     config: {
-            //         enumValues: categories
-            //     }
-            // },
-        //     price: {
-        //         dataType: "number",
-        //         title: "Price",
-        //         validation: {
-        //             requiredMessage: "You must set a price between 0 and 1000",
-        //             min: 0,
-        //             max: 1000
-        //         },
-        //         config: {
-        //             customPreview: PriceTextPreview
-        //         },
-        //         description: "Price with range validation"
-        //     },
+            approved: {
+                dataType: "boolean",
+                title: "Approved?",
+                disabled:true
+            },
+            unavailable: {
+                dataType: "boolean",
+                title: "Unavailable?",
+                disabled:true
+            },
 
-        //     currency: {
-        //         dataType: "string",
-        //         title: "Currency",
-        //         config: {
-        //             enumValues: {
-        //                 EUR: "Euros",
-        //                 DOL: "Dollars"
-        //             }
-        //         },
-        //         validation: {
-        //             required: true
-        //         }
-        //     },
-        //     public: {
-        //         dataType: "boolean",
-        //         title: "Public",
-        //         description: "Should this partner be visible in the website",
-        //         longDescription: "Example of a long description hidden under a tooltip. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin quis bibendum turpis. Sed scelerisque ligula nec nisi pellentesque, eget viverra lorem facilisis. Praesent a lectus ac ipsum tincidunt posuere vitae non risus. In eu feugiat massa. Sed eu est non velit facilisis facilisis vitae eget ante. Nunc ut malesuada erat. Nullam sagittis bibendum porta. Maecenas vitae interdum sapien, ut aliquet risus. Donec aliquet, turpis finibus aliquet bibendum, tellus dui porttitor quam, quis pellentesque tellus libero non urna. Vestibulum maximus pharetra congue. Suspendisse aliquam congue quam, sed bibendum turpis. Aliquam eu enim ligula. Nam vel magna ut urna cursus sagittis. Suspendisse a nisi ac justo ornare tempor vel eu eros."
-        //     },
-        //     brand: {
-        //         dataType: "string",
-        //         title: "Brand",
-        //         validation: {
-        //             required: true
-        //         }
-        //     },
-        //     amazon_link: {
-        //         dataType: "string",
-        //         title: "Amazon link",
-        //         config: {
-        //             url: true
-        //         }
-        //     },
-        //     related_partners: {
-        //         dataType: "array",
-        //         title: "Related partners",
-        //         description: "Reference to self",
-        //         of: {
-        //             dataType: "reference",
-        //             collectionPath: "partners"
-        //         }
-        //     },
-        //     publisher: {
-        //         title: "Publisher",
-        //         description: "This is an example of a map property",
-        //         dataType: "map",
-        //         properties: {
-        //             name: {
-        //                 title: "Name",
-        //                 dataType: "string"
-        //             },
-        //             external_id: {
-        //                 title: "External id",
-        //                 dataType: "string"
-        //             }
-        //         }
-        //     },
-        //     min_known_price: {
-        //         dataType: "number",
-        //         title: "Min known price",
-        //         disabled: true,
-        //         description: "Minimum price this partner has ever had"
-        //     },
-        //     prime_eligible: {
-        //         dataType: "boolean",
-        //         title: "Prime eligible",
-        //         disabled: true
-        //     },
-        //     uppercase_name: {
-        //         title: "Uppercase Name",
-        //         dataType: "string",
-        //         disabled: true,
-        //         description: "This field gets updated with a preSave hook"
-        //     }
-
-        // },
-        // defaultValues: {
-        //     currency: "EUR",
-        //     publisher: {
-        //         name: "Default publisher"
-        //     }
         }
     });
 
@@ -559,7 +463,30 @@ function App() {
                 disabled:true,
                 dataType: "string"
             },
-            
+            subscription: {
+                title: "Subscription",
+                disabled:true,
+                dataType: "map",
+                properties: {
+                    status: {
+                        title: "Status",
+                        dataType: "string",
+                    },
+                    nickname: {
+                        title: "Plan",
+                        dataType: "string",
+                    },
+                    currentPeriodEnd: {
+                        title: "End of Current Period",
+                        dataType: "number",
+                    },
+                },
+            },
+            stripeCustomerId: {
+                title: "Stripe Customer ID",
+                disabled:true,
+                dataType: "string"
+            },
             couponCount: {
                 title: "Coupon Count",
                 dataType: "number",
@@ -587,21 +514,10 @@ function App() {
                     integer:true
                 }
             },
-            subscription: {
-                title: "Subscription",
-                disabled:true,
-                dataType: "map",
-                properties: {
-                    status: {
-                        title: "Status",
-                        dataType: "string",
-                    },
-                    nickname: {
-                        title: "Plan",
-                        dataType: "string",
-                    },
-                },
-            },
+            // endOfPeriod: {
+            //     title: "End of Current Period",
+            //     dataType: "string",    
+            // }
             // picture: {
             //     title: "Picture",
             //     dataType: "map",
@@ -630,17 +546,39 @@ function App() {
         }
     });
 
-    // const partnerAdditionalColumn: AdditionalColumnDelegate<typeof partnerSchema> = {
-    //     id: "restaurantName",
-    //     title: "Store Name",
-    //     builder: (entity: Entity<typeof partnerSchema>) =>
-    //     entity.values.basicInfo.restaurantName
+    const partnerAdditionalColumn: AdditionalColumnDelegate<typeof partnerSchema> = {
+        id: "unavailable",
+        title: "Unavailable",
+        builder: (entity: Entity<typeof partnerSchema>) =>
+        (entity.values.covidOpen == false)? true : false
+        // !entity.values.covidOpen
+            // <AsyncPreviewComponent builder={
+            //     entity.reference.collection("locales")
+            //         .doc("es")
+            //         .get()
+            //         .then((snapshot: any) => snapshot.get("name") as string)
+            // }/>
+    };
+
+    // const userAdditionalColumn: AdditionalColumnDelegate<typeof usersSchema> = {
+    //     id: "endOfPeriod",
+    //     title: "End of Current Period",
+    //     builder: (entity: Entity<typeof usersSchema>) => {
+    //         // console.log(
+    //         // entity.values.subscription['currentPeriodEnd']
+    //         // );
+    //         const sub :Map<string,any> = entity.values.subscription
+    //         const milli  = sub.get('currentPeriodEnd'] * 1000
+    //         const dateObject = new Date(milli)
+    //         const humanDateFormat = dateObject.toLocaleString() 
+    //         return humanDateFormat
     //         // <AsyncPreviewComponent builder={
-    //         //     entity.reference.collection("locales")
-    //         //         .doc("es")
-    //         //         .get()
-    //         //         .then((snapshot: any) => snapshot.get("name") as string)
+    //             // entity.reference.collection("locales")
+    //             //     .doc("es")
+    //             //     .get()
+    //             //     .then((snapshot: any) => snapshot.get("name") as string)
     //         // }/>
+    //     }
     // };
 
 
@@ -682,9 +620,9 @@ function App() {
         textSearchDelegate: partnersSearchDelegate,
         defaultSize:"s",
         // excludedProperties
-        // additionalColumns: [partnerAdditionalColumn],
+        additionalColumns: [partnerAdditionalColumn],
         // excludedProperties: ["images"],
-        filterableProperties: ["approved", "covidOpen"],
+        filterableProperties: ["approved", "covidOpen","unavailable"],
         pagination:true,
         inlineEditing:false,
         deleteEnabled:false,
@@ -700,6 +638,7 @@ function App() {
         inlineEditing:false,
         deleteEnabled:false,
         // deleteEnabled:
+        // additionalColumns: [userAdditionalColumn],
         filterableProperties:["email", "firstName", "lastName","couponCount", "trialEnds"],
         subcollections: [
             buildCollection({
@@ -708,7 +647,7 @@ function App() {
                 schema: couponSchema
             })
         ],
-        properties: ["firstName", "lastName", "email", "couponCount", "trialCouponCount", ]
+        properties: ["firstName", "lastName", "email", "couponCount", "trialCouponCount","createdAt" ]
     });
 
     
@@ -753,7 +692,7 @@ function App() {
         
         const bool = docRef.get().then(function(doc) {
             if (doc.exists) {
-                console.log("Document data:", doc.data());
+                // console.log("Document data:", doc.data());
                 return true;
             } else {
                 // doc.data() will be undefined in this case
